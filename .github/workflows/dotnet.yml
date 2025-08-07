@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Restore dependencies
-      run: dotnet restore src/tsol/tsol.sln
+      run: dotnet restore tsol.slnx
     - name: Build
-      run: dotnet build src/tsol/tsol.sln --no-restore
+      run: dotnet build tsol.slnx --no-restore
     - name: Test
-      run: dotnet test src/tsol/tsol.sln --no-build --verbosity normal
+      run: dotnet test tsol.slnx --no-build --verbosity normal

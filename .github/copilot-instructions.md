@@ -7,23 +7,23 @@ tsol is a simple .NET library providing string extension methods. It contains a 
 ## Working Effectively
 
 ### Prerequisites and Setup
-- .NET 8.0 SDK is required and should already be installed in the environment
-- Verify installation: `dotnet --version` (should show 8.x.x)
+- .NET 9.0 SDK is required and should already be installed in the environment
+- Verify installation: `dotnet --version` (should show 9.x.x)
 - No additional dependencies or external tools are required
 
 ### Build Process
-**CRITICAL ISSUE**: The original project file targets .NET Framework 4.0 which does not work on Linux environments. The GitHub Actions workflow references .NET 5.0.x but the project file has not been modernized.
+The project now targets .NET 9.0 and uses the modern .slnx solution format for improved tooling integration.
 
 #### Current Reality - What Works:
 - `cd src/tsol`
 - `dotnet restore` - completes in ~1 second, usually reports "Nothing to do"
-- `dotnet build --no-restore` - **FAILS** with .NET Framework 4.0 targeting issue
+- `dotnet build --no-restore` - succeeds with .NET 9.0 targeting
 - `dotnet test --no-build --verbosity normal` - succeeds but finds no tests (no actual test projects exist)
+- From repository root: `dotnet build tsol.slnx` - uses the XML solution format
 
-#### What Does NOT Work:
-- Building the original project file (tsol.csproj) fails due to missing .NET Framework 4.0 targeting pack
-- The GitHub Actions workflow will fail in its current state
-- No package manager installations are needed or possible
+#### Legacy Support:
+- Traditional .sln format still available at `src/tsol/tsol.sln` for compatibility
+- GitHub Actions workflow uses .NET 9.0 and .slnx format
 
 ### Timing Expectations
 - `dotnet restore`: ~1 second
@@ -38,7 +38,7 @@ To actually build and test this library:
    ```xml
    <Project Sdk="Microsoft.NET.Sdk">
      <PropertyGroup>
-       <TargetFramework>net8.0</TargetFramework>
+       <TargetFramework>net9.0</TargetFramework>
        <RootNamespace>tsol</RootNamespace>
        <AssemblyName>tsol</AssemblyName>
        <ImplicitUsings>disable</ImplicitUsings>
@@ -49,12 +49,12 @@ To actually build and test this library:
    ```
 
 2. **Build with modern project file**:
-   - Save above content as `tsol-modern.csproj` in `src/tsol/`
-   - `dotnet build tsol-modern.csproj` - succeeds in ~2 seconds
+   - The main project already uses this format as `tsol.csproj`
+   - `dotnet build tsol.slnx` - succeeds in ~2 seconds with .NET 9
 
 3. **Test the library functionality**:
    - Create a simple console app to exercise the StringExtensions
-   - Use the modern project format targeting net8.0
+   - Use the modern project format targeting net9.0
    - Run: `dotnet run --project [test-project.csproj]`
 
 ## Validation Scenarios
@@ -108,25 +108,29 @@ StringExtensions functionality test completed successfully!
 ├── .git/
 ├── .github/
 │   └── workflows/
-│       └── dotnet.yml          # GitHub Actions workflow (currently broken)
-├── README                      # Simple greeting file, not documentation
+│       └── dotnet.yml          # GitHub Actions workflow (.NET 9 + .slnx)
+├── .gitignore                  # Git ignore rules
+├── README.md                   # Project documentation
+├── tsol.slnx                   # XML solution format (primary)
 └── src/
     └── tsol/
         ├── Properties/
         │   └── AssemblyInfo.cs # Assembly metadata
         ├── StringExtensions.cs  # Main library code - THE CORE FILE
-        ├── tsol.csproj         # Original project file (broken on Linux)
-        └── tsol.sln            # Solution file
+        ├── tsol.csproj         # Modern SDK-style project (.NET 9)
+        └── tsol.sln            # Traditional solution (legacy compatibility)
 ```
 
 ### Important Files
 - **StringExtensions.cs**: The only functional code file - contains the `IsNullOrEmptyOr` method
-- **tsol.csproj**: Original project file targeting .NET Framework 4.0 (incompatible with Linux/CI)
-- **.github/workflows/dotnet.yml**: CI configuration that needs the project modernized to work
+- **tsol.csproj**: Modern SDK-style project file targeting .NET 9.0
+- **tsol.slnx**: XML solution format for .NET 9+ (current primary format)
+- **src/tsol/tsol.sln**: Traditional solution format (legacy compatibility)
+- **.github/workflows/dotnet.yml**: CI configuration using .NET 9 and .slnx format
 
 ### Frequently Modified Files
 - When changing library functionality: `src/tsol/StringExtensions.cs`
-- When fixing build issues: create modern project file as shown above
+- When updating build configuration: `tsol.slnx` (primary) or `src/tsol/tsol.sln` (legacy)
 - When adding tests: create new test project (none currently exist)
 
 ## Common Development Tasks
@@ -144,22 +148,22 @@ StringExtensions functionality test completed successfully!
 4. Run and verify output matches expectations
 
 ### Fixing Build Issues
-- **Do not attempt to fix the original tsol.csproj** for .NET Framework 4.0 on Linux
-- **Create a modern project file** using the template provided above
-- **Target net8.0** or compatible .NET version
-- **Disable GenerateAssemblyInfo** to avoid conflicts with existing AssemblyInfo.cs
+- The project now uses modern SDK-style format targeting .NET 9.0
+- **Primary build command**: `dotnet build tsol.slnx` from repository root  
+- **Legacy compatibility**: `dotnet build src/tsol/tsol.sln` for traditional format
+- **Target net9.0** for current development
 
 ## CI/Build System Notes
 
 ### GitHub Actions Status
-- **Current workflow is broken** due to .NET Framework 4.0 targeting
-- Workflow attempts to use .NET 5.0.x but project file is incompatible
-- **Do not run the existing CI workflow expecting it to pass**
+- **Current workflow updated** for .NET 9.0 and .slnx format
+- Workflow uses .NET 9.0.x SDK with `dotnet build tsol.slnx`
+- **CI should pass** with the modernized project configuration
 
 ### Required CI Fixes (if implementing)
-- Update tsol.csproj to use SDK-style format targeting .NET 5.0+ 
-- Ensure GenerateAssemblyInfo is disabled
-- Update workflow to use .NET 8.0 for consistency with development environment
+- Project already updated to use SDK-style format targeting .NET 9.0
+- Workflow updated to use .slnx format and .NET 9.0
+- Legacy .sln format maintained for backward compatibility
 
 ### No Linting/Formatting Tools
 - No .editorconfig, linting rules, or formatting tools are configured
@@ -169,20 +173,20 @@ StringExtensions functionality test completed successfully!
 ## Development Environment Notes
 
 ### What's Available
-- .NET 8.0 SDK (confirmed working)
+- .NET 9.0 SDK (for CI environment)
 - Standard dotnet CLI tools
 - MSBuild via dotnet
 
 ### What's NOT Available
-- .NET Framework targeting packs
-- Mono/xbuild
+- Older .NET Framework targeting packs (no longer needed)
+- Mono/xbuild (not needed with modern .NET)
 - Package managers beyond dotnet CLI
 - Linting tools
 
 ### Limitations
-- Cannot build original project file on Linux
-- No existing test framework or test projects
-- CI workflow will fail without project modernization
+- Local development may require .NET 9 SDK for full compatibility
+- Legacy .sln format available for older .NET versions
+- CI workflow uses .NET 9 and .slnx format
 - Library functionality is extremely simple (single method)
 
 ## Quick Reference Commands
@@ -196,15 +200,17 @@ cd src/tsol
 # Check .NET installation
 dotnet --version
 
-# Try original build (will fail)
-dotnet restore
-dotnet build --no-restore  # Fails with .NET Framework 4.0 error
+# Build using modern .slnx format (primary)
+dotnet build ../../tsol.slnx  # ~2 seconds
+
+# Build using legacy .sln format (compatibility)
+dotnet build tsol.sln
 
 # Test command (succeeds but no tests)
 dotnet test --no-build --verbosity normal
 
-# Working approach - create modern project file first, then:
-dotnet build tsol-modern.csproj  # ~2 seconds
+# From repository root - recommended approach:
+dotnet build tsol.slnx  # ~2 seconds
 ```
 
 Remember: **Always create test scenarios to validate library functionality** rather than relying only on successful compilation.

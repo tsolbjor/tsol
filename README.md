@@ -4,7 +4,7 @@ A simple .NET library providing string extension methods.
 
 ## Building
 
-### Current (.NET 8)
+### Current (.NET 9)
 ```bash
 cd src/tsol
 dotnet restore
@@ -13,18 +13,18 @@ dotnet build --no-restore
 
 Or from repository root:
 ```bash
-dotnet build src/tsol/tsol.sln
+dotnet build tsol.slnx
 ```
 
-### Future (.NET 9+)
-When upgrading to .NET 9 or later, you can use the XML solution format:
+### Legacy (.NET 8 and earlier)
+For older .NET versions, you can use the traditional solution format:
 ```bash
-dotnet build tsol.slnx
+dotnet build src/tsol/tsol.sln
 ```
 
 ## Solution File Formats
 
-- `src/tsol/tsol.sln` - Traditional MSBuild solution format (current)
-- `tsol.slnx` - XML solution format (for .NET 9+)
+- `tsol.slnx` - XML solution format (current, requires .NET 9+)
+- `src/tsol/tsol.sln` - Traditional MSBuild solution format (legacy compatibility)
 
-The repository has been prepared for the transition to .slnx format when upgrading to .NET 9+.
+The repository uses the .slnx format with .NET 9 for improved tooling and development experience.
