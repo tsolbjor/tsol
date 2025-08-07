@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- This XML solution format requires .NET 9 or later -->
-<!-- To use: dotnet build tsol.slnx (when upgraded to .NET 9+) -->
+<!-- Now actively using: dotnet build tsol.slnx -->
 <Solution>
   <Project Path="src/tsol/tsol.csproj" />
 </Solution>
