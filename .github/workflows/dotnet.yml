@@ -16,10 +16,10 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore tsol.slnx
+      run: dotnet restore src/tsol/tsol.sln
     - name: Build
-      run: dotnet build tsol.slnx --no-restore
+      run: dotnet build src/tsol/tsol.sln --no-restore
     - name: Test
-      run: dotnet test tsol.slnx --no-build --verbosity normal
+      run: dotnet test src/tsol/tsol.sln --no-build --verbosity normal
